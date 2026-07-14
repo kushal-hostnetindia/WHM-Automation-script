@@ -71,23 +71,6 @@ run_cmd_strict() {
 main_setup() {
 
     # --------------------------------------------
-    #  STEP 0 — System Update & Tools
-    # --------------------------------------------
-    echo ""
-    echo "========================================"
-    echo "  Updating System..."
-    echo "========================================"
-    dnf update -y
-
-    echo ""
-    echo "========================================"
-    echo "  Installing Required Tools..."
-    echo "========================================"
-    dnf install -y --skip-broken curl wget tar \
-        perl-libwww-perl perl-LWP-Protocol-https perl-Time-HiRes \
-        perl-IO-Socket-INET6 perl-Net-SSLeay perl-IO-Socket-SSL
-
-    # --------------------------------------------
     #  Validate cPanel Version & Set cpupdate.conf
     # --------------------------------------------
     if [[ -z "$CPANEL_VERSION" ]]; then
@@ -95,7 +78,7 @@ main_setup() {
         echo "  cPanel Version : not provided — installing latest"
         echo "[OK] Skipping cpupdate.conf — latest will be installed"
     else
-        VALID_VERSIONS=("11.126" "11.130" "11.132" "11.134" "11.136" "release")
+        VALID_VERSIONS=("11.86" "11.94" "11.102" "11.110" "11.118" "11.124" "11.126" "11.130" "11.132" "11.134" "11.136" "136.1" "release")
         VERSION_VALID=0
         for V in "${VALID_VERSIONS[@]}"; do
             if [[ "$CPANEL_VERSION" == ${V}* ]]; then
@@ -561,15 +544,23 @@ EOF
     #  System Update & Tools (Outside Screen)
     # --------------------------------------------
     echo "========================================"
+    echo "  Updating System..."
+    echo "========================================"
+    dnf update -y
+
+    echo ""
+    echo "========================================"
     echo "  Installing EPEL Release..."
     echo "========================================"
     dnf install -y epel-release
 
     echo ""
     echo "========================================"
-    echo "  Installing Screen..."
+    echo "  Installing Required Tools..."
     echo "========================================"
-    dnf install -y screen
+    dnf install -y --skip-broken curl wget tar screen \
+        perl-libwww-perl perl-LWP-Protocol-https perl-Time-HiRes \
+        perl-IO-Socket-INET6 perl-Net-SSLeay perl-IO-Socket-SSL
 
     export USER_NAME CLIENT_NAME NEW_HOSTNAME CPANEL_VERSION WHM_LICENSE NODE_EXPORTER
     export OS_NAME="$NAME" OS_VERSION="$VERSION_ID"
