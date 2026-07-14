@@ -87,6 +87,13 @@ main_setup() {
         perl-libwww-perl perl-LWP-Protocol-https perl-Time-HiRes \
         perl-IO-Socket-INET6 perl-Net-SSLeay perl-IO-Socket-SSL
 
+    echo ""
+    echo "========================================"
+    echo "  Installing & Enabling sysstat..."
+    echo "========================================"
+    dnf install -y sysstat
+    systemctl enable --now sysstat
+
     # --------------------------------------------
     #  Validate cPanel Version & Set cpupdate.conf
     # --------------------------------------------
@@ -166,6 +173,9 @@ main_setup() {
     echo ""
     echo "  Verifying CSF config..."
     grep -E '^TESTING|^RESTRICT_SYSLOG' /etc/csf/csf.conf
+
+    run_cmd_strict "Allowing port 9280 in CSF..." \
+        bash -c 'grep -q "^TCP_IN" /etc/csf/csf.conf && sed -i "s/^TCP_IN = \"\(.*\)\"/TCP_IN = \"\1,9280\"/" /etc/csf/csf.conf'
 
     run_cmd_strict "Restarting CSF..."   csf -r
     run_cmd_strict "Enabling CSF..."     systemctl enable csf
